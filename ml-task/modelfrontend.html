@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Match Predictor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cricket Match Predictor</h1>
+        <form id="predictForm">
+            <div class="form-group">
+                <label for="features">Enter match features (comma separated):</label>
+                <input type="text" id="features" name="features" placeholder="e.g., 45.0, 30.0, 40.0, 25.0, 1, 0">
+            </div>
+            <button type="submit">Predict</button>
+        </form>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('predictForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form from submitting the traditional way
+
+            const features = document.getElementById('features').value;
+            const featuresArray = features.split(',').map(value => parseFloat(value.trim()));
+
+            fetch('http://192.168.1.18:5000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ features: featuresArray })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').textContent = 'Prediction: ' + (data.prediction === 1 ? 'Win' : 'Loss');
+            })
+            .catch(error => {
+                document.getElementById('result').textContent = 'Error: ' + error.message;
+            });
+        });
+    </script>
+</body>
+</html>
